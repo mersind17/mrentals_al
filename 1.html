@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="sq" id="htmlLang">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-translate-key="page_title_main">MRentals - Makina me Qera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link rel="icon" href="https://placehold.co/48x48/009688/FFFFFF?text=M&font=Inter&bold" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primary-color: #007f6b;
+            --secondary-color: #006054;
+            --accent-color: #ffc107;
+            --text-light: #f0f0f0;
+            --text-dark: #004a3e;
+            --card-bg: #006758;
+            --card-border: #005a4d;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            background-image: linear-gradient(to bottom right, var(--primary-color), var(--secondary-color));
+            color: var(--text-light);
+            font-size: 17px;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: rgba(0, 48, 40, 0.75);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: padding 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        header.scrolled {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background-color: rgba(0, 40, 32, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Logo sizing: initial size from Tailwind classes, scrolled size from below */
+        /* For mobile (h-12 is approx 3rem) */
+        header.scrolled #headerLogoMainPage.h-12 {
+            height: 2.5rem;
+            /* 40px */
+        }
+
+        /* For desktop (md:h-14 is approx 3.5rem) */
+        header.scrolled #headerLogoMainPage.md\:h-14 {
+            /* Escaped colon for CSS */
+            height: 3rem;
+            /* 48px */
+        }
+
+        /* Fallback if specific Tailwind classes are not matched, or for direct targeting */
+        /* header.scrolled #headerLogoMainPage {
+            Default scrolled height if above don't match, adjust as needed
+            height: 3rem;  
+        } */
+
+
+        .lang-switcher button.active img {
+            outline: 3px solid var(--accent-color);
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.7);
+        }
+
+        .lang-switcher img {
+            /* Default for desktop */
+            width: 36px;
+            height: 24px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        /* Mobile language switcher images */
+        .md\:hidden .lang-switcher img {
+            width: 32px;
+            height: 21px;
+        }
+
+
+        .lang-switcher button:hover img {
+            transform: scale(1.18) rotate(3deg);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .spec-icon {
+            width: 1.3em;
+            height: 1.3em;
+            margin-right: 0.65em;
+            vertical-align: -0.3em;
+            fill: var(--accent-color);
+        }
+
+        .main-action-button {
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .main-action-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(var(--accent-color), 0.3);
+            filter: brightness(1.15);
+        }
+
+        .hero-cta-button {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .car-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            border-radius: 16px;
+        }
+
+        .car-card:hover {
+            transform: translateY(-10px) scale(1.04);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-color);
+        }
+
+        .car-card .relative img {
+            transition: transform 0.4s ease, filter 0.4s ease;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .car-card:hover .relative img {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+
+        .car-card .image-gradient-overlay {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+        }
+
+        .car-card .car-book-button {
+            font-weight: 700;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background-color: #005547;
+            color: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .leaflet-popup-content {
+            margin: 18px 26px !important;
+            line-height: 1.6;
+        }
+
+        .leaflet-popup-tip-container .leaflet-popup-tip {
+            background-color: #005547;
+        }
+
+        .leaflet-popup-close-button:hover {
+            color: var(--accent-color) !important;
+            transform: scale(1.2);
+            transition: transform 0.2s;
+        }
+
+        .leaflet-control-attribution {
+            background-color: rgba(0, 48, 40, 0.85) !important;
+            border-radius: 6px;
+        }
+
+        .leaflet-control-attribution a {
+            /* Style links in attribution */
+            color: var(--accent-color) !important;
+        }
+
+
+        section {
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
+
+        section#hero {
+            padding-top: 0;
+            padding-bottom: 0;
+            min-height: 80vh;
+            /* Ensure hero takes significant height */
+            display: flex;
+            /* Added for vertical centering of content */
+            align-items: center;
+            /* Added for vertical centering */
+        }
+
+
+        section#cars {
+            padding-top: 5rem;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 800;
+        }
+
+        h2.section-title {
+            color: #ffffff;
+            margin-bottom: 3.5rem;
+            font-size: 2.75rem;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #why-us h3 {
+            font-size: 1.75rem;
+        }
+
+        #contact p strong {
+            color: var(--accent-color);
+        }
+
+        .why-us-icon {
+            width: 4rem;
+            height: 4rem;
+            margin-bottom: 1.25rem;
+            fill: var(--accent-color);
+            stroke: var(--accent-color);
+            stroke-width: 1.5;
+            transition: transform 0.3s ease;
+        }
+
+        .why-us-card {
+            background-color: #005c4c;
+            border: 1px solid #004d3e;
+            transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.35s ease;
+            border-radius: 16px;
+        }
+
+        .why-us-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            background-color: #006758;
+        }
+
+        .why-us-card:hover .why-us-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        nav a {
+            /* Applies to both desktop and mobile nav links */
+            position: relative;
+            padding-bottom: 0.4rem;
+            transition: color 0.3s ease;
+            display: block;
+            /* Ensure full clickable area for mobile menu items */
+        }
+
+        @media (min-width: 768px) {
+
+            /* md breakpoint */
+            nav#mainNavDesktop a {
+                /* Target only desktop nav links */
+                display: inline-block;
+                /* Revert for desktop */
+            }
+        }
+
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2.5px;
+            background-color: var(--accent-color);
+            transition: width 0.35s ease-out;
+            border-radius: 1px;
+        }
+
+        nav a:hover::after,
+        nav a.active-link::after {
+            width: 100%;
+        }
+
+        /* For mobile menu, make underline slightly less wide if preferred */
+        #mainNavMobile ul li a.active-link::after,
+        #mainNavMobile ul li a:hover::after {
+            width: 60%;
+            /* Or 100% if you prefer full underline on mobile too */
+        }
+
+
+        nav a.active-link {
+            color: var(--accent-color);
+        }
+
+        footer .heart-icon {
+            transition: transform 0.3s ease, color 0.3s ease;
+            display: inline-block;
+        }
+
+        footer .heart-icon:hover {
+            transform: scale(1.3);
+            color: #ff8a80;
+        }
+    </style>
+</head>
+
+<body class="text-white">
+
+    <header id="mainHeader" class="shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center" data-aos="fade-right" data-aos-duration="800">
+                <img src="Logo.jpg" alt="MRentals Logo" id="headerLogoMainPage"
+                    class="h-12 md:h-14 mr-2 md:mr-3 transition-all duration-300" data-translate-alt-key="alt_logo"
+                    onerror="this.src='https://placehold.co/200x60/007f6b/FFFFFF?text=Logo+Gabim&font=Inter&bold'; this.onerror=null;" />
+            </a>
+
+            <div class="hidden md:flex items-center space-x-3 md:space-x-5" data-aos="fade-left"
+                data-aos-duration="800">
+                <nav id="mainNavDesktop">
+                    <ul class="flex space-x-3 md:space-x-5 text-lg font-semibold">
+                        <li><a href="#hero" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_home">Kryefaqja</a></li>
+                        <li><a href="#cars" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_cars">Makinat</a></li>
+                        <li><a href="#why-us" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_why_us">Pse Ne?</a></li>
+                        <li><a href="#booking" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_book">Rezervo</a></li>
+                        <li><a href="#location" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_location">Vendndodhja</a></li>
+                        <li><a href="#contact" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_contact">Kontakti</a></li>
+                    </ul>
+                </nav>
+                <div
+                    class="lang-switcher flex items-center space-x-2 border-l border-gray-700 pl-3 ml-1 md:pl-5 md:ml-3">
+                    <button id="lang-sq-btn" onclick="changeLanguage('sq')" class="p-1 active">
+                        <img src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag"
+                            onerror="this.src='https://placehold.co/36x24/FF0000/FFFFFF?text=SQ&font=Inter&bold'; this.onerror=null;">
+                    </button>
+                    <button id="lang-en-btn" onclick="changeLanguage('en')" class="p-1">
+                        <img src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag"
+                            onerror="this.src='https://placehold.co/36x24/0000FF/FFFFFF?text=EN&font=Inter&bold'; this.onerror=null;">
+                    </button>
+                </div>
+            </div>
+
+            <div class="md:hidden flex items-center space-x-3">
+                <div class="lang-switcher flex items-center space-x-2">
+                    <button id="lang-sq-btn-mobile" onclick="changeLanguage('sq')" class="p-1">
+                        <img src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag"
+                            onerror="this.src='https://placehold.co/32x21/FF0000/FFFFFF?text=SQ&font=Inter&bold'; this.onerror=null;">
+                    </button>
+                    <button id="lang-en-btn-mobile" onclick="changeLanguage('en')" class="p-1">
+                        <img src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag"
+                            onerror="this.src='https://placehold.co/32x21/0000FF/FFFFFF?text=EN&font=Inter&bold'; this.onerror=null;">
+                    </button>
+                </div>
+                <button id="hamburgerBtn"
+                    class="text-white p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--accent-color)] rounded">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-4 6h4"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobileMenu"
+            class="hidden md:hidden bg-[rgba(0,40,32,0.97)] backdrop-blur-lg absolute top-full left-0 w-full shadow-xl border-t border-[rgba(255,255,255,0.1)]">
+            <nav id="mainNavMobile" class="py-4">
+                <ul class="flex flex-col items-center space-y-1 text-lg font-semibold">
+                    <li><a href="#hero" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_home">Kryefaqja</a></li>
+                    <li><a href="#cars" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_cars">Makinat</a></li>
+                    <li><a href="#why-us" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_why_us">Pse Ne?</a></li>
+                    <li><a href="#booking" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_book">Rezervo</a></li>
+                    <li><a href="#location" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_location">Vendndodhja</a></li>
+                    <li><a href="#contact" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_contact">Kontakti</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="hero" class="relative bg-cover bg-center"
+        style="background-image: url('https://placehold.co/1920x1080/004d3e/007f6b?text=Eksploro+Rrugën+me+MRentals&font=Inter');">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70"></div>
+        <div class="relative container mx-auto px-6 text-center z-10 flex flex-col items-center justify-center h-full"
+            data-aos="fade-up" data-aos-duration="1000">
+            <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white mb-8 leading-tight"
+                data-translate-key="hero_title">Partneri Juaj Ideal <br class="hidden md:block" /> për Makina me Qera
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-12 max-w-3xl mx-auto" data-translate-key="hero_subtitle">
+                Zbuloni lirinë e lëvizjes me flotën tonë moderne dhe çmimet më konkurruese.</p>
+            <a href="#cars"
+                class="hero-cta-button inline-block bg-[var(--accent-color)] text-[var(--text-dark)] font-bold px-12 py-5 rounded-xl shadow-xl hover:bg-yellow-300 text-xl main-action-button"
+                data-translate-key="hero_cta_button">
+                Shiko Makinat
+            </a>
+        </div>
+    </section>
+
+
+    <section id="cars">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-center" data-translate-key="available_cars_title" data-aos="fade-up">Makinat
+                Tona në Dispozicion</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="100">
+                    <a href="audi-a5-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="a51.jpg" alt="Audi A5 i zi, pamje anësore"
+                                data-translate-alt-key="alt_audi_a5_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_audi_a5">Audi A5</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_audi_a5_card">2.0 Automat</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2013
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 50€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('Audi A5', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="Audi A5" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="200">
+                    <a href="mercedes-e-class-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="benc1.jpg" alt="Mercedes E-Class i bardhë, pamje ballore"
+                                data-translate-alt-key="alt_mercedes_e_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_mercedes_e">Mercedes E-Class</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_mercedes_e_card">2.2 Automat</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2007
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 30€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('Mercedes E-Class', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="Mercedes E-Class" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="300">
+                    <a href="volvo-xc90-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="volvo1.jpg" alt="Volvo XC90 gri, pamje treçerekëshe"
+                                data-translate-alt-key="alt_volvo_xc90_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_volvo_xc90">Volvo XC90</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_volvo_xc90_card">2.4</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2007
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 50€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('Volvo XC90', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="Volvo XC90" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="100">
+                    <a href="vw-golf-6-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="golfblu1.jpg" alt="VW Golf 6 blu, pamje anësore"
+                                data-translate-alt-key="alt_vw_golf_6_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_vw_golf_6">VW Golf 6 (Blu)</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_vw_golf_6_card">2.0</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2013
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 35€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('VW Golf 6 (Blu)', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="VW Golf 6 (Blu)" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="200">
+                    <a href="skoda-octavia-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="skoda1.jpg" alt="Skoda Octavia e kuqe, pamje ballore"
+                                data-translate-alt-key="alt_skoda_octavia_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_skoda_octavia">Skoda Octavia</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_skoda_octavia_card">1.9</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2009
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 30€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('Skoda Octavia', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="Skoda Octavia" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="300">
+                    <a href="vw-passat-jetta-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="jeta1.jpg" alt="VW Passat Jetta argjendi, pamje anësore"
+                                data-translate-alt-key="alt_vw_passat_jetta_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_vw_passat_jetta">VW Passat Jetta</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_vw_passat_jetta_card">1.6</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2013
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 35€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('VW Passat Jetta', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="VW Passat Jetta" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+
+                <div class="car-card flex flex-col" data-aos="fade-up" data-aos-delay="100"> <a
+                        href="vw-golf-6-black-details.html" target="_blank" class="block">
+                        <div class="relative overflow-hidden">
+                            <img src="golfzi1.jpg" alt="VW Golf 6 i zi, pamje ballore"
+                                data-translate-alt-key="alt_vw_golf_6_black_card" class="w-full h-64 object-cover"
+                                loading="lazy"
+                                onerror="this.src='https://placehold.co/600x400/cccccc/000000?text=Imazhi+Nuk+Gjendet'; this.onerror=null;" />
+                            <div class="image-gradient-overlay absolute bottom-0 left-0 right-0 p-5">
+                                <h3 class="text-2xl font-bold text-white shadow-sm"
+                                    data-translate-key="car_name_vw_golf_6_black">VW Golf 6 (i zi)</h3>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="p-6 flex-grow">
+                        <ul class="text-base text-gray-200 space-y-3 mt-1">
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M7 4V2h10v2h2v2h-1.17L16 12h3v2h-3l-1.17 6H18v2H6v-2h1.17L9 14H6v-2h3l1.17-6H9V6H7V4zm2.83 8L12 6.83 14.17 12H9.83zM12 17.17L9.83 14h4.34L12 17.17z" />
+                                </svg>
+                                <strong data-translate-key="spec_engine_short">Motor:</strong> <span
+                                    data-translate-key="engine_val_vw_golf_6_black_card">1.6 Diesel</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 19h2.5l1.71-4.29L12 16l1.79-1.29L15.5 19H18c.55 0 1-.45 1-1v-3.5c0-.83-.84-1.5-1.99-1.5H7.99C6.84 13 6 13.67 6 14.5V18c0 .55.45 1 1 1zM6.5 7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5V9H6.5V7.5zm11 0V9h-2v-.5c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5V9h-2V7.5c0-1.93 1.57-3.5 3.5-3.5h3c1.93 0 3.5 1.57 3.5 3.5z" />
+                                </svg>
+                                <strong data-translate-key="spec_fuel_short">Karburant:</strong> <span
+                                    data-translate-key="fuel_diesel">Naftë</span>
+                            </li>
+                            <li>
+                                <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm-7-8h-2v2h2v-2z" />
+                                </svg>
+                                <strong data-translate-key="spec_year_short">Viti:</strong> 2009
+                            </li>
+                            <li class="text-2xl font-bold text-[var(--accent-color)] mt-5"><span
+                                    data-translate-key="price_label_short">Çmimi:</span> 30€<span
+                                    data-translate-key="price_per_day_short">/dita</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 pt-2 mt-auto">
+                        <a href="#" onclick="openWhatsAppForCar('VW Golf 6 (i zi)', document.documentElement.lang)"
+                            class="block w-full bg-[var(--accent-color)] text-[var(--text-dark)] text-center py-3.5 px-4 rounded-lg car-book-button main-action-button"
+                            data-carname="VW Golf 6 (i zi)" data-translate-key="book_this_car_short">Rezervo Këtë</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="why-us" class="bg-[var(--card-bg)]">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="section-title" data-translate-key="why_us_title" data-aos="fade-up">Pse të Zgjidhni MRentals?
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+                <div class="why-us-card p-8 rounded-xl shadow-xl text-center" data-aos="fade-up" data-aos-delay="100">
+                    <svg class="why-us-icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold mb-3" data-translate-key="why_us_item1_title">Çmime Konkurruese
+                    </h3>
+                    <p class="text-gray-300 leading-relaxed" data-translate-key="why_us_item1_desc">Ne ofrojmë çmimet më
+                        të mira në treg pa kompromentuar cilësinë e shërbimit.</p>
+                </div>
+                <div class="why-us-card p-8 rounded-xl shadow-xl text-center" data-aos="fade-up" data-aos-delay="200">
+                    <svg class="why-us-icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.37 3.414-1.415 3.414H4.828c-1.785 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold mb-3" data-translate-key="why_us_item2_title">Flotë Moderne</h3>
+                    <p class="text-gray-300 leading-relaxed" data-translate-key="why_us_item2_desc">Makinat tona janë të
+                        reja, të mirëmbajtura dhe të pajisura me teknologjinë më të fundit.</p>
+                </div>
+                <div class="why-us-card p-8 rounded-xl shadow-xl text-center" data-aos="fade-up" data-aos-delay="300">
+                    <svg class="why-us-icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold mb-3" data-translate-key="why_us_item3_title">Rezervim i Lehtë
+                    </h3>
+                    <p class="text-gray-300 leading-relaxed" data-translate-key="why_us_item3_desc">Proces i thjeshtë
+                        dhe i shpejtë rezervimi përmes WhatsApp, pa formalitete të tepërta.</p>
+                </div>
+                <div class="why-us-card p-8 rounded-xl shadow-xl text-center" data-aos="fade-up" data-aos-delay="400">
+                    <svg class="why-us-icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold mb-3" data-translate-key="why_us_item4_title">Shërbim Klienti</h3>
+                    <p class="text-gray-300 leading-relaxed" data-translate-key="why_us_item4_desc">Ekipi ynë është
+                        gjithmonë i gatshëm t'ju ndihmojë dhe t'ju ofrojë mbështetje 24/7.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="booking" class="bg-[#005f4f]">
+        <div class="container mx-auto px-6 text-center" data-aos="zoom-in-up">
+            <h2 class="section-title" data-translate-key="book_your_car_title">Rezervo Makinen Tënde Sot!</h2>
+            <p class="text-xl text-gray-300 mt-6 mb-12 max-w-3xl mx-auto leading-relaxed"
+                data-translate-key="book_your_car_text">
+                Zgjidhni makinën që ju përshtatet dhe na kontaktoni direkt në WhatsApp për të finalizuar rezervimin tuaj
+                shpejt dhe lehtë.
+            </p>
+            <a href="https://wa.me/355695169873?text=Përshëndetje, dua të rezervoj një makinë nga MRentals."
+                target="_blank"
+                class="inline-block bg-[var(--accent-color)] text-[var(--text-dark)] px-16 py-5 rounded-xl shadow-xl text-xl main-action-button"
+                data-translate-key="book_whatsapp_general" data-translate-href-text-key="whatsapp_prefill_book_general">
+                Rezervo në WhatsApp
+            </a>
+        </div>
+    </section>
+
+    <section id="location">
+        <div class="container mx-auto px-6" data-aos="fade-in" data-aos-duration="1200">
+            <h2 class="section-title text-center" data-translate-key="our_location">Vendndodhja Jonë</h2>
+            <div id="mapMain"
+                class="h-[400px] md:h-[650px] rounded-2xl shadow-2xl border-4 border-[var(--card-border)] mt-10 overflow-hidden">
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="bg-[#005f4f]">
+        <div class="container mx-auto px-6 text-center" data-aos="fade-up">
+            <h2 class="section-title" data-translate-key="contact_us">Na Kontaktoni</h2>
+            <div class="space-y-8 text-xl text-gray-200 mt-10 max-w-xl mx-auto">
+                <p><strong data-translate-key="address_label">Adresa:</strong> <span
+                        data-translate-key="address_value">Bulevardi Qemal Stafa, Elbasan, Shqipëri</span></p>
+                <p><strong data-translate-key="whatsapp_label">WhatsApp:</strong> <a id="whatsappContactLinkMain"
+                        href="https://wa.me/355695169873?text=Përshëndetje, kam një pyetje për MRentals."
+                        data-translate-href-text-key="whatsapp_prefill_general_question"
+                        class="text-[var(--accent-color)] hover:underline ml-2 transition-colors duration-300">+355 69
+                        516 9873</a></p>
+                <p><strong data-translate-key="instagram_label">Instagram:</strong> <a
+                        href="https://instagram.com/mrentals_al" target="_blank"
+                        class="text-[var(--accent-color)] hover:underline ml-2 transition-colors duration-300">@mrentals_al</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#00473b] text-center py-14">
+        <div class="container mx-auto px-6 text-gray-400">
+            <p id="copyrightMain" class="text-lg" data-translate-key="copyright">&copy; 2024 MRentals. Të gjitha të
+                drejtat e rezervuara.</p>
+            <p class="text-md mt-4" data-translate-key="designed_by">Dizajnuar me <span
+                    class="text-[var(--accent-color)] text-2xl mx-1 heart-icon">&hearts;</span> nga Ekipi Juaj</p>
+        </div>
+    </footer>
+
+    <script>
+        const translations = {
+            en: {
+                page_title_main: "MRentals - Premium Car Rentals",
+                alt_logo: "MRentals Premium Logo",
+                nav_home: "Home",
+                nav_cars: "Our Cars",
+                nav_why_us: "Why Choose Us?",
+                nav_book: "Book Now",
+                nav_location: "Find Us",
+                nav_contact: "Contact Us",
+                alt_albanian_flag: "Albanian Language",
+                alt_english_flag: "English Language",
+                hero_title: "Your Ideal Partner <br class='hidden md:block'/> for Car Rentals",
+                hero_subtitle: "Discover the freedom of movement with our modern fleet and competitive prices.",
+                hero_cta_button: "View Cars",
+                available_cars_title: "Our Available Cars",
+                alt_audi_a5_card: "Black Audi A5, side view",
+                car_name_audi_a5: "Audi A5",
+                engine_val_audi_a5_card: "2.0 Automatic",
+                alt_mercedes_e_card: "White Mercedes E-Class, front view",
+                car_name_mercedes_e: "Mercedes E-Class",
+                engine_val_mercedes_e_card: "2.2 Automatic",
+                alt_volvo_xc90_card: "Grey Volvo XC90, three-quarter view",
+                car_name_volvo_xc90: "Volvo XC90",
+                engine_val_volvo_xc90_card: "2.4",
+                alt_vw_golf_6_card: "Blue VW Golf 6, side view",
+                car_name_vw_golf_6: "VW Golf 6 (Blue)",
+                engine_val_vw_golf_6_card: "2.0",
+                alt_skoda_octavia_card: "Red Skoda Octavia, front view",
+                car_name_skoda_octavia: "Skoda Octavia",
+                engine_val_skoda_octavia_card: "1.9",
+                alt_vw_passat_jetta_card: "Silver VW Passat Jetta, side view",
+                car_name_vw_passat_jetta: "VW Passat Jetta",
+                engine_val_vw_passat_jetta_card: "1.6",
+                alt_vw_golf_6_black_card: "Black VW Golf 6, front view",
+                car_name_vw_golf_6_black: "VW Golf 6 (Black)",
+                engine_val_vw_golf_6_black_card: "1.6 Diesel",
+                spec_engine_short: "Engine:",
+                spec_fuel_short: "Fuel:",
+                spec_year_short: "Year:",
+                price_label_short: "Price:",
+                price_per_day_short: "/day",
+                fuel_diesel: "Diesel",
+                fuel_petrol: "Petrol",
+                book_this_car_short: "Book This Car",
+                whatsapp_prefill_book_car: "Hello, I am interested in booking the {carName}.",
+                why_us_title: "Why Choose MRentals?",
+                why_us_item1_title: "Competitive Prices",
+                why_us_item1_desc: "We offer the best prices on the market without compromising service quality.",
+                why_us_item2_title: "Modern Fleet",
+                why_us_item2_desc: "Our cars are new, well-maintained, and equipped with the latest technology.",
+                why_us_item3_title: "Easy Booking",
+                why_us_item3_desc: "Simple and fast booking process via WhatsApp, without excessive formalities.",
+                why_us_item4_title: "Customer Service",
+                why_us_item4_desc: "Our team is always ready to help and provide you with 24/7 support.",
+                book_your_car_title: "Book Your Car Today!",
+                book_your_car_text: "Choose the car that suits you and contact us directly on WhatsApp to finalize your booking quickly and easily.",
+                book_whatsapp_general: "Book on WhatsApp",
+                whatsapp_prefill_book_general: "Hello, I want to book a car from MRentals.",
+                our_location: "Our Location",
+                contact_us: "Contact Us",
+                address_label: "Address:",
+                address_value: "Qemal Stafa Boulevard, Elbasan, Albania",
+                whatsapp_label: "WhatsApp:",
+                whatsapp_prefill_general_question: "Hello, I have a question for MRentals.",
+                instagram_label: "Instagram:",
+                copyright: "&copy; {year} MRentals. All rights reserved.",
+                designed_by: "Designed with <span class='text-[var(--accent-color)] text-2xl mx-1 heart-icon'>&hearts;</span> by Your Team",
+                map_popup_text: "<b>MRentals</b><br>We are here!"
+            },
+            sq: {
+                page_title_main: "MRentals - Makina me Qera Premium",
+                alt_logo: "Logo Premium MRentals",
+                nav_home: "Kryefaqja",
+                nav_cars: "Makinat Tona",
+                nav_why_us: "Pse të na Zgjidhni?",
+                nav_book: "Rezervo Tani",
+                nav_location: "Na Gjeni",
+                nav_contact: "Na Kontaktoni",
+                alt_albanian_flag: "Gjuha Shqipe",
+                alt_english_flag: "Gjuha Angleze",
+                hero_title: "Partneri Juaj Ideal <br class='hidden md:block'/> për Makina me Qera",
+                hero_subtitle: "Zbuloni lirinë e lëvizjes me flotën tonë moderne dhe çmimet më konkurruese.",
+                hero_cta_button: "Shiko Makinat",
+                available_cars_title: "Makinat Tona në Dispozicion",
+                alt_audi_a5_card: "Audi A5 i zi, pamje anësore",
+                car_name_audi_a5: "Audi A5",
+                engine_val_audi_a5_card: "2.0 Automat",
+                alt_mercedes_e_card: "Mercedes E-Class i bardhë, pamje ballore",
+                car_name_mercedes_e: "Mercedes E-Class",
+                engine_val_mercedes_e_card: "2.2 Automat",
+                alt_volvo_xc90_card: "Volvo XC90 gri, pamje treçerekëshe",
+                car_name_volvo_xc90: "Volvo XC90",
+                engine_val_volvo_xc90_card: "2.4",
+                alt_vw_golf_6_card: "VW Golf 6 blu, pamje anësore",
+                car_name_vw_golf_6: "VW Golf 6 (Blu)",
+                engine_val_vw_golf_6_card: "2.0",
+                alt_skoda_octavia_card: "Skoda Octavia e kuqe, pamje ballore",
+                car_name_skoda_octavia: "Skoda Octavia",
+                engine_val_skoda_octavia_card: "1.9",
+                alt_vw_passat_jetta_card: "VW Passat Jetta argjendi, pamje anësore",
+                car_name_vw_passat_jetta: "VW Passat Jetta",
+                engine_val_vw_passat_jetta_card: "1.6",
+                alt_vw_golf_6_black_card: "VW Golf 6 i zi, pamje ballore",
+                car_name_vw_golf_6_black: "VW Golf 6 (i zi)",
+                engine_val_vw_golf_6_black_card: "1.6 Diesel",
+                spec_engine_short: "Motor:",
+                spec_fuel_short: "Karburant:",
+                spec_year_short: "Viti:",
+                price_label_short: "Çmimi:",
+                price_per_day_short: "/dita",
+                fuel_diesel: "Naftë",
+                fuel_petrol: "Benzinë",
+                book_this_car_short: "Rezervo Këtë",
+                whatsapp_prefill_book_car: "Përshëndetje, jam i interesuar të rezervoj {carName}.",
+                why_us_title: "Pse të Zgjidhni MRentals?",
+                why_us_item1_title: "Çmime Konkurruese",
+                why_us_item1_desc: "Ne ofrojmë çmimet më të mira në treg pa kompromentuar cilësinë e shërbimit.",
+                why_us_item2_title: "Flotë Moderne",
+                why_us_item2_desc: "Makinat tona janë të reja, të mirëmbajtura dhe të pajisura me teknologjinë më të fundit.",
+                why_us_item3_title: "Rezervim i Lehtë",
+                why_us_item3_desc: "Proces i thjeshtë dhe i shpejtë rezervimi përmes WhatsApp, pa formalitete të tepërta.",
+                why_us_item4_title: "Shërbim Klienti",
+                why_us_item4_desc: "Ekipi ynë është gjithmonë i gatshëm t'ju ndihmojë dhe t'ju ofrojë mbështetje 24/7.",
+                book_your_car_title: "Rezervo Makinen Tënde Sot!",
+                book_your_car_text: "Zgjidhni makinën që ju përshtatet dhe na kontaktoni direkt në WhatsApp për të finalizuar rezervimin tuaj shpejt dhe lehtë.",
+                book_whatsapp_general: "Rezervo në WhatsApp",
+                whatsapp_prefill_book_general: "Përshëndetje, dua të rezervoj një makinë nga MRentals.",
+                our_location: "Vendndodhja Jonë",
+                contact_us: "Na Kontaktoni",
+                address_label: "Adresa:",
+                address_value: "Bulevardi Qemal Stafa, Elbasan, Shqipëri",
+                whatsapp_label: "WhatsApp:",
+                whatsapp_prefill_general_question: "Përshëndetje, kam një pyetje për MRentals.",
+                instagram_label: "Instagram:",
+                copyright: "&copy; {year} MRentals. Të gjitha të drejtat e rezervuara.",
+                designed_by: "Dizajnuar me <span class='text-[var(--accent-color)] text-2xl mx-1 heart-icon'>&hearts;</span> nga Ekipi Juaj",
+                map_popup_text: "<b>MRentals</b><br>Këtu ndodhemi!"
+            }
+        };
+
+        let leafletMapInstance;
+        let leafletMarkerInstance;
+        const mapLocationCoords = [41.11504487728793, 20.08821811349093]; // Elbasan coordinates
+
+        function initLeafletMap() {
+            const mapMainElement = document.getElementById('mapMain');
+            if (mapMainElement && typeof L !== 'undefined') {
+                if (leafletMapInstance) { // If map already exists, remove it before reinitializing
+                    leafletMapInstance.remove();
+                }
+                leafletMapInstance = L.map('mapMain', {
+                    scrollWheelZoom: false // Disable scroll wheel zoom by default
+                }).setView(mapLocationCoords, 16); // Zoom level 16
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19,
+                    tileSize: 512,
+                    zoomOffset: -1
+                }).addTo(leafletMapInstance);
+
+                const mRentalsIcon = L.icon({
+                    iconUrl: 'https://placehold.co/50x50/009688/FFFFFF?text=M&font=Inter&bold', // Slightly smaller custom icon
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 50], // Point of the icon which will correspond to marker's location
+                    popupAnchor: [0, -50], // Point from which the popup should open relative to the iconAnchor
+                    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [12, 41]
+                });
+
+                leafletMarkerInstance = L.marker(mapLocationCoords, { icon: mRentalsIcon }).addTo(leafletMapInstance);
+                const currentLang = document.documentElement.lang || localStorage.getItem('preferredLanguage') || 'sq';
+                const popupText = translations[currentLang] ? (translations[currentLang]['map_popup_text'] || 'MRentals Location') : 'MRentals Location';
+                leafletMarkerInstance.bindPopup(popupText).openPopup();
+
+                // Re-enable scroll wheel zoom on map click
+                leafletMapInstance.on('click', function () {
+                    leafletMapInstance.scrollWheelZoom.enable();
+                });
+                // Disable scroll wheel zoom when mouse leaves map
+                leafletMapInstance.on('mouseout', function () {
+                    leafletMapInstance.scrollWheelZoom.disable();
+                });
+
+
+            } else {
+                console.error("Elementi i hartës 'mapMain' nuk u gjet ose Leaflet nuk u ngarkua.");
+                if (mapMainElement) {
+                    mapMainElement.innerHTML = '<p style="text-align:center; padding:20px; color: var(--text-light);">Harta nuk mund të ngarkohej. Ju lutemi kontrolloni lidhjen tuaj të internetit.</p>';
+                }
+            }
+        }
+
+        function openWhatsAppForCar(carName, currentLangParam) {
+            const lang = currentLangParam || document.documentElement.lang || localStorage.getItem('preferredLanguage') || 'sq';
+            let prefillText = translations[lang] ? translations[lang]['whatsapp_prefill_book_car'] : "Hello, I am interested in booking the {carName}.";
+            prefillText = prefillText.replace('{carName}', carName);
+            const whatsappUrl = `https://wa.me/355695169873?text=${encodeURIComponent(prefillText)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function changeLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-translate-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-key');
+                if (translations[lang] && translations[lang][key]) {
+                    let translatedText = translations[lang][key];
+                    if (key === 'copyright') {
+                        const year = new Date().getFullYear();
+                        translatedText = translatedText.replace('{year}', year);
+                    }
+                    if (key === 'copyright' || key === 'designed_by' || key === 'hero_title' || element.innerHTML.includes("<br")) {
+                        element.innerHTML = translatedText;
+                    } else {
+                        element.textContent = translatedText;
+                    }
+                }
+            });
+
+            document.querySelectorAll('[data-translate-alt-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-alt-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.alt = translations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-translate-href-text-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-href-text-key');
+                const baseHref = element.href.split('?text=')[0];
+                if (translations[lang] && translations[lang][key]) {
+                    if (baseHref) {
+                        element.href = `${baseHref}?text=${encodeURIComponent(translations[lang][key])}`;
+                    }
+                }
+            });
+
+            const pageTitleElement = document.querySelector('title[data-translate-key]');
+            if (pageTitleElement) {
+                const key = pageTitleElement.getAttribute('data-translate-key');
+                if (translations[lang] && translations[lang][key]) {
+                    document.title = translations[lang][key];
+                }
+            }
+
+            localStorage.setItem('preferredLanguage', lang);
+            // Desktop lang buttons
+            document.getElementById('lang-sq-btn').classList.toggle('active', lang === 'sq');
+            document.getElementById('lang-en-btn').classList.toggle('active', lang === 'en');
+            // Mobile lang buttons
+            const langSqBtnMobile = document.getElementById('lang-sq-btn-mobile');
+            const langEnBtnMobile = document.getElementById('lang-en-btn-mobile');
+            if (langSqBtnMobile) langSqBtnMobile.classList.toggle('active', lang === 'sq');
+            if (langEnBtnMobile) langEnBtnMobile.classList.toggle('active', lang === 'en');
+
+
+            document.querySelectorAll('.car-book-button').forEach(button => {
+                const carName = button.getAttribute('data-carname');
+                if (translations[lang] && translations[lang]['book_this_car_short']) {
+                    button.textContent = translations[lang]['book_this_car_short'];
+                }
+                // Ensure the onclick function is updated with the new language context
+                button.setAttribute('onclick', `openWhatsAppForCar('${carName}', '${lang}')`);
+            });
+
+            if (leafletMarkerInstance && leafletMapInstance) { // Check if map and marker exist
+                const popupText = translations[lang] ? (translations[lang]['map_popup_text'] || 'MRentals Location') : 'MRentals Location';
+                leafletMarkerInstance.setPopupContent(popupText);
+                // If you want the popup to reopen on language change:
+                if (leafletMapInstance.hasLayer(leafletMarkerInstance) && leafletMarkerInstance.getPopup()) {
+                    leafletMarkerInstance.openPopup();
+                }
+            }
+            updateActiveNavLink();
+        }
+
+        function updateActiveNavLink() {
+            const sections = document.querySelectorAll('section[id]');
+            // Target links in both desktop and mobile navs
+            const navLinks = document.querySelectorAll('#mainNavDesktop a, #mainNavMobile a');
+            let currentSectionId = '';
+            const headerHeight = document.getElementById('mainHeader') ? document.getElementById('mainHeader').offsetHeight : 70; // Fallback header height
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                // Check if section is in viewport, considering header height as offset
+                if (window.pageYOffset >= (sectionTop - headerHeight - 20) && window.pageYOffset < (sectionTop + section.offsetHeight - headerHeight - 20)) {
+                    currentSectionId = section.getAttribute('id');
+                }
+            });
+            // Special case for hero section if at the very top
+            if (window.pageYOffset < sections[0].offsetTop - headerHeight - 20 && sections[0].id === 'hero') {
+                currentSectionId = 'hero';
+            }
+
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-link');
+                // Check if the link's href matches the current section ID
+                if (link.getAttribute('href') === `#${currentSectionId}`) {
+                    link.classList.add('active-link');
+                }
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({
+                duration: 900,
+                once: true,
+                offset: 80,
+                easing: 'ease-out-cubic',
+            });
+
+            const preferredLanguage = localStorage.getItem('preferredLanguage') || 'sq';
+            changeLanguage(preferredLanguage); // This will also call updateActiveNavLink and init map
+            initLeafletMap();
+
+
+            // Hamburger Menu Logic for Main Page
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerBtn && mobileMenu) {
+                const mobileNavLinks = mobileMenu.querySelectorAll('a');
+
+                hamburgerBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent click from bubbling up to document
+                    const isHidden = mobileMenu.classList.toggle('hidden');
+                    hamburgerBtn.setAttribute('aria-expanded', String(!isHidden));
+                    if (isHidden) {
+                        hamburgerBtn.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
+                        document.body.style.overflow = '';
+                    } else {
+                        hamburgerBtn.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+
+                mobileNavLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        hamburgerBtn.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
+                        hamburgerBtn.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
+                        // updateActiveNavLink will be called by scroll or language change, but can be called here too if needed
+                    });
+                });
+                // Close mobile menu if clicked outside
+                document.addEventListener('click', (event) => {
+                    if (!mobileMenu.classList.contains('hidden') && !mobileMenu.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+                        mobileMenu.classList.add('hidden');
+                        hamburgerBtn.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
+                        hamburgerBtn.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+
+
+            // Header scroll effect
+            const header = document.getElementById('mainHeader');
+            if (header) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        header.classList.add('scrolled');
+                    } else {
+                        header.classList.remove('scrolled');
+                    }
+                    updateActiveNavLink();
+                });
+            }
+            updateActiveNavLink(); // Initial check
+        });
+    </script>
+</body>
+
+</html>
