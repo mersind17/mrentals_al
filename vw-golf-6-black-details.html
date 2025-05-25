@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="sq" id="htmlLang">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-translate-key="page_title_vw_golf_6">Detajet e VW Golf 6 - MRentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="icon" href="https://placehold.co/48x48/009688/FFFFFF?text=M&font=Inter&bold" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primary-color: #007f6b;
+            --secondary-color: #006054;
+            --accent-color: #ffc107;
+            --text-light: #f0f0f0;
+            --text-dark: #004a3e;
+            --card-bg: #006758;
+            --card-border: #005a4d;
+            --details-bg: #005c4f;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            background-image: linear-gradient(to bottom right, var(--primary-color), var(--secondary-color));
+            color: var(--text-light);
+            font-size: 16px;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: rgba(0, 48, 40, 0.75);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: padding 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        header.scrolled {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background-color: rgba(0, 40, 32, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #headerLogoVWGolf6Details {
+            height: 3rem;
+            transition: height 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            #headerLogoVWGolf6Details {
+                height: 4rem;
+            }
+        }
+
+        header.scrolled #headerLogoVWGolf6Details {
+            height: 2.5rem;
+        }
+
+        @media (min-width: 768px) {
+            header.scrolled #headerLogoVWGolf6Details {
+                height: 3.5rem;
+            }
+        }
+
+        .lang-switcher button.active img {
+            outline: 3px solid var(--accent-color);
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.7);
+        }
+
+        .lang-switcher img {
+            width: 32px;
+            height: 21px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        @media (min-width: 768px) {
+            .lang-switcher img {
+                width: 36px;
+                height: 24px;
+            }
+        }
+
+        .lang-switcher button:hover img {
+            transform: scale(1.18) rotate(3deg);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .main-action-button {
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .main-action-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(var(--accent-color), 0.3);
+            filter: brightness(1.15);
+        }
+
+        .car-details-section {
+            background-color: var(--details-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .gallery-image {
+            border-radius: 8px;
+            object-fit: cover;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .gallery-image:hover,
+        .gallery-image.active-thumbnail {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .main-image-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid var(--accent-color);
+        }
+
+        .main-image-container img {
+            border-radius: 9px;
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .spec-list li {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.95rem;
+        }
+
+        @media (min-width: 768px) {
+            .spec-list li {
+                font-size: 1rem;
+                padding: 0.75rem 0;
+            }
+        }
+
+        .spec-list li:last-child {
+            border-bottom: none;
+        }
+
+        .spec-list .spec-label {
+            font-weight: 600;
+            color: var(--accent-color);
+            min-width: 100px;
+            margin-right: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .spec-list .spec-label {
+                min-width: 120px;
+            }
+        }
+
+        .spec-list .spec-value {
+            color: var(--text-light);
+        }
+
+        .spec-list .fas {
+            margin-right: 10px;
+            color: var(--accent-color);
+            width: 20px;
+            text-align: center;
+        }
+
+        nav a {
+            position: relative;
+            padding-bottom: 0.4rem;
+            transition: color 0.3s ease;
+            display: block;
+        }
+
+        @media (min-width: 768px) {
+            nav a {
+                display: inline-block;
+            }
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2.5px;
+            background-color: var(--accent-color);
+            transition: width 0.35s ease-out;
+            border-radius: 1px;
+        }
+
+        nav a:hover::after,
+        nav a.active-link::after {
+            width: 100%;
+        }
+
+        #mainNavMobileVWGolf6Details ul li a.active-link::after,
+        #mainNavMobileVWGolf6Details ul li a:hover::after {
+            width: 60%;
+        }
+
+        nav a.active-link {
+            color: var(--accent-color);
+        }
+
+        footer .heart-icon {
+            transition: transform 0.3s ease, color 0.3s ease;
+            display: inline-block;
+        }
+
+        footer .heart-icon:hover {
+            transform: scale(1.3);
+            color: #ff8a80;
+        }
+
+        .back-to-main-button {
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .back-to-main-button {
+                font-size: 1rem;
+            }
+        }
+
+        .back-to-main-button:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+
+<body class="text-white">
+
+    <header id="mainHeader" class="shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center" data-aos="fade-right" data-aos-duration="800">
+                <img src="Logo.jpg" alt="MRentals Logo" id="headerLogoVWGolf6Details" class="mr-2 md:mr-3"
+                    data-translate-alt-key="alt_logo"
+                    onerror="this.src='https://placehold.co/220x70/007f6b/FFFFFF?text=Logo+Error&font=Inter&bold'; this.onerror=null;" />
+            </a>
+
+            <div class="hidden md:flex items-center space-x-3 md:space-x-5" data-aos="fade-left"
+                data-aos-duration="800">
+                <nav id="mainNavDesktopVWGolf6Details">
+                    <ul class="flex space-x-3 md:space-x-5 text-base lg:text-lg font-semibold">
+                        <li><a href="index.html#hero" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_home">Kryefaqja</a></li>
+                        <li><a href="index.html#cars" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_cars">Makinat</a></li>
+                        <li><a href="index.html#why-us" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_why_us">Pse Ne?</a></li>
+                        <li><a href="index.html#booking" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_book">Rezervo</a></li>
+                        <li><a href="index.html#location" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_location">Vendndodhja</a></li>
+                        <li><a href="index.html#contact" class="hover:text-[var(--accent-color)]"
+                                data-translate-key="nav_contact">Kontakti</a></li>
+                    </ul>
+                </nav>
+                <div
+                    class="lang-switcher flex items-center space-x-2 border-l border-gray-700 pl-3 ml-1 md:pl-5 md:ml-3">
+                    <button id="lang-sq-btn" onclick="changeLanguage('sq')" class="p-1 active">
+                        <img src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag">
+                    </button>
+                    <button id="lang-en-btn" onclick="changeLanguage('en')" class="p-1">
+                        <img src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag">
+                    </button>
+                </div>
+            </div>
+
+            <div class="md:hidden flex items-center space-x-3">
+                <div class="lang-switcher flex items-center space-x-2">
+                    <button id="lang-sq-btn-mobile" onclick="changeLanguage('sq')" class="p-1">
+                        <img src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag">
+                    </button>
+                    <button id="lang-en-btn-mobile" onclick="changeLanguage('en')" class="p-1">
+                        <img src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag">
+                    </button>
+                </div>
+                <button id="hamburgerBtnVWGolf6Details"
+                    class="text-white p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--accent-color)] rounded">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-4 6h4"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobileMenuVWGolf6Details"
+            class="hidden md:hidden bg-[rgba(0,40,32,0.97)] backdrop-blur-lg absolute top-full left-0 w-full shadow-xl border-t border-[rgba(255,255,255,0.1)]">
+            <nav id="mainNavMobileVWGolf6Details" class="py-4">
+                <ul class="flex flex-col items-center space-y-1 text-lg font-semibold">
+                    <li><a href="index.html#hero" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_home">Kryefaqja</a></li>
+                    <li><a href="index.html#cars" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_cars">Makinat</a></li>
+                    <li><a href="index.html#why-us"
+                            class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_why_us">Pse Ne?</a></li>
+                    <li><a href="index.html#booking"
+                            class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_book">Rezervo</a></li>
+                    <li><a href="index.html#location"
+                            class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_location">Vendndodhja</a></li>
+                    <li><a href="index.html#contact"
+                            class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
+                            data-translate-key="nav_contact">Kontakti</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="py-8 md:py-12 lg:py-16">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="mb-6 md:mb-8" data-aos="fade-right">
+                <a href="index.html"
+                    class="inline-flex items-center text-gray-300 hover:text-[var(--accent-color)] transition-colors duration-300 back-to-main-button px-4 py-2 rounded-lg">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span data-translate-key="back_to_cars_list">Kthehu te Lista e Makinave</span>
+                </a>
+            </div>
+
+            <div class="car-details-section p-4 md:p-8 lg:p-10" data-aos="fade-up" data-aos-duration="900">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-6 md:mb-8 text-center md:text-left"
+                    data-translate-key="car_name_vw_golf_6_details">VW Golf 6</h1>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 lg:gap-12 items-start">
+                    <div class="lg:col-span-3">
+                        <div class="main-image-container mb-4" data-aos="zoom-in">
+                            <img id="mainCarImage" src="golfzi1.jpg" alt="VW Golf 6 pamje kryesore"
+                                class="w-full h-auto object-cover">
+                        </div>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-3">
+                            <img src="golfzi1.jpg" alt="VW Golf 6 pamje anësore"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32 active-thumbnail"
+                                onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="100">
+                            <img src="golfz2.jpg" alt="VW Golf 6 pamje e brendshme"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32"
+                                onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="200">
+                            <img src="golfzi3.jpg" alt="VW Golf 6 detaj"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32"
+                                onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="300">
+                            <img src="Logo.jpg" alt="VW Golf 6 pamje prapa"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32 hidden sm:block"
+                                onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="400"
+                                onerror="this.style.display='none';">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 mt-6 lg:mt-0">
+                        <div class="bg-[var(--primary-color)] p-4 md:p-6 rounded-xl shadow-lg">
+                            <h2 class="text-2xl md:text-3xl font-bold text-[var(--accent-color)] mb-4 md:mb-6"
+                                data-translate-key="specifications_title">Specifikimet</h2>
+                            <ul class="spec-list space-y-1">
+                                <li><span class="spec-label"><i class="fas fa-cogs"></i><span
+                                            data-translate-key="spec_engine">Motorri:</span></span> <span
+                                        class="spec-value" data-translate-key="engine_val_vw_golf_6_details">1.6
+                                    </span></li>
+                                <li><span class="spec-label"><i class="fas fa-exchange-alt"></i><span
+                                            data-translate-key="spec_gearbox">Kambio:</span></span> <span
+                                        class="spec-value" data-translate-key="gearbox_automatic">Automatike</span></li>
+                                <li><span class="spec-label"><i class="fas fa-gas-pump"></i><span
+                                            data-translate-key="spec_fuel">Karburanti:</span></span> <span
+                                        class="spec-value" data-translate-key="fuel_diesel_details">Naftë</span></li>
+                                <li><span class="spec-label"><i class="fas fa-calendar-alt"></i><span
+                                            data-translate-key="spec_year">Viti:</span></span> <span
+                                        class="spec-value">2009</span></li>
+
+                                <li><span class="spec-label"><i class="fas fa-users"></i><span
+                                            data-translate-key="spec_seats">Sedilje:</span></span> <span
+                                        class="spec-value">5</span></li>
+                                <li><span class="spec-label"><i class="fas fa-snowflake"></i><span
+                                            data-translate-key="spec_ac">Kondicioner:</span></span> <span
+                                        class="spec-value" data-translate-key="yes">Po</span></li>
+                            </ul>
+
+                            <div class="mt-6 md:mt-8 text-center">
+                                <p class="text-3xl md:text-4xl font-extrabold text-white mb-2"><span
+                                        data-translate-key="price_label_details">Çmimi:</span> 30€<span
+                                        class="text-xl md:text-2xl font-semibold"
+                                        data-translate-key="price_per_day_details">/dita</span></p>
+                                <button onclick="openWhatsAppForCar('VW Golf 6', document.documentElement.lang)"
+                                    class="w-full mt-4 bg-[var(--accent-color)] text-[var(--text-dark)] py-3 px-5 md:py-4 md:px-6 rounded-lg text-lg md:text-xl main-action-button"
+                                    data-translate-key="book_this_car_details">
+                                    <i class="fab fa-whatsapp mr-2"></i>Rezervo Tani në WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#00473b] text-center py-10 md:py-14">
+        <div class="container mx-auto px-4 sm:px-6 text-gray-400">
+            <p id="copyrightMain" class="text-base md:text-lg" data-translate-key="copyright">&copy; {year} MRentals. Të
+                gjitha të drejtat e rezervuara.</p>
+
+        </div>
+    </footer>
+
+    <script>
+        const translations = {
+            en: {
+                page_title_vw_golf_6: "VW Golf 6 Details - MRentals",
+                alt_logo: "MRentals Premium Logo",
+                nav_home: "Home",
+                nav_cars: "Our Cars",
+                nav_why_us: "Why Choose Us?",
+                nav_book: "Book Now",
+                nav_location: "Find Us",
+                nav_contact: "Contact Us",
+                alt_albanian_flag: "Albanian Language",
+                alt_english_flag: "English Language",
+                back_to_cars_list: "Back to Cars List",
+                car_name_vw_golf_6_details: "VW Golf 6",
+                specifications_title: "Specifications",
+                spec_engine: "Engine:",
+                engine_val_vw_golf_6_details: "1.6 ",
+                spec_fuel: "Fuel:",
+                fuel_diesel_details: "Diesel",
+                spec_year: "Year:",
+                spec_gearbox: "Gearbox:",
+                gearbox_automatic: "Manual",
+                spec_doors: "Doors:",
+                spec_seats: "Seats:",
+                spec_ac: "Air Conditioning:",
+                yes: "Yes",
+                price_label_details: "Price:",
+                price_per_day_details: "/day",
+                book_this_car_details: "Book Now on WhatsApp",
+                copyright: "&copy; {year} MRentals. All rights reserved.",
+                designed_by: "Designed with <span class='text-[var(--accent-color)] text-xl md:text-2xl mx-1 heart-icon'>&hearts;</span> by Your Team",
+                whatsapp_prefill_book_car: "Hello, I am interested in booking the {carName}."
+            },
+            sq: {
+                page_title_vw_golf_6: "Detajet e VW Golf 6 - MRentals",
+                alt_logo: "Logo Premium MRentals",
+                nav_home: "Kryefaqja",
+                nav_cars: "Makinat Tona",
+                nav_why_us: "Pse të na Zgjidhni?",
+                nav_book: "Rezervo Tani",
+                nav_location: "Na Gjeni",
+                nav_contact: "Na Kontaktoni",
+                alt_albanian_flag: "Gjuha Shqipe",
+                alt_english_flag: "Gjuha Angleze",
+                back_to_cars_list: "Kthehu te Lista e Makinave",
+                car_name_vw_golf_6_details: "VW Golf 6",
+                specifications_title: "Specifikimet",
+                spec_engine: "Motorri:",
+                engine_val_vw_golf_6_details: "1.6 ",
+                spec_fuel: "Karburanti:",
+                fuel_diesel_details: "Naftë",
+                spec_year: "Viti:",
+                spec_gearbox: "Kambio:",
+                gearbox_automatic: "Manuale",
+                spec_seats: "Sedilje:",
+                spec_ac: "Kondicioner:",
+                yes: "Po",
+                price_label_details: "Çmimi:",
+                price_per_day_details: "/dita",
+                book_this_car_details: "Rezervo Tani në WhatsApp",
+                copyright: "&copy; {year} MRentals. Të gjitha të drejtat e rezervuara.",
+                designed_by: "Dizajnuar me <span class='text-[var(--accent-color)] text-xl md:text-2xl mx-1 heart-icon'>&hearts;</span> nga Ekipi Juaj",
+                whatsapp_prefill_book_car: "Përshëndetje, jam i interesuar të rezervoj {carName}."
+            }
+        };
+
+        function changeMainImage(newSrc, clickedThumbnail) {
+            document.getElementById('mainCarImage').src = newSrc;
+            const thumbnails = document.querySelectorAll('.gallery-image');
+            thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail'));
+            if (clickedThumbnail) {
+                clickedThumbnail.classList.add('active-thumbnail');
+            }
+        }
+
+        function openWhatsAppForCar(carName, currentLang) {
+            const lang = currentLang || document.documentElement.lang || 'sq';
+            let prefillText = translations[lang] ? translations[lang]['whatsapp_prefill_book_car'] : "Hello, I am interested in booking the {carName}.";
+            prefillText = prefillText.replace('{carName}', carName);
+            const whatsappUrl = `https://wa.me/355695169873?text=${encodeURIComponent(prefillText)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function changeLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-translate-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-key');
+                if (translations[lang] && translations[lang][key]) {
+                    let translatedText = translations[lang][key];
+                    if (key === 'copyright') {
+                        const year = new Date().getFullYear();
+                        translatedText = translatedText.replace('{year}', year);
+                    }
+                    if (key === 'copyright' || key === 'designed_by' || element.innerHTML.includes("<br") || key.includes("_description_")) {
+                        element.innerHTML = translatedText;
+                    } else {
+                        element.textContent = translatedText;
+                    }
+                }
+            });
+
+            document.querySelectorAll('[data-translate-alt-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-alt-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.alt = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('[data-translate-href-text-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-href-text-key');
+                const baseHref = element.href.split('?text=')[0];
+                if (translations[lang] && translations[lang][key]) {
+                    if (baseHref) {
+                        element.href = `${baseHref}?text=${encodeURIComponent(translations[lang][key])}`;
+                    }
+                }
+            });
+
+            const pageTitleElement = document.querySelector('title[data-translate-key]');
+            if (pageTitleElement) {
+                const key = pageTitleElement.getAttribute('data-translate-key');
+                if (translations[lang] && translations[lang][key]) {
+                    document.title = translations[lang][key];
+                }
+            }
+
+            localStorage.setItem('preferredLanguage', lang);
+            document.getElementById('lang-sq-btn').classList.toggle('active', lang === 'sq');
+            document.getElementById('lang-en-btn').classList.toggle('active', lang === 'en');
+            const langSqBtnMobile = document.getElementById('lang-sq-btn-mobile');
+            const langEnBtnMobile = document.getElementById('lang-en-btn-mobile');
+            if (langSqBtnMobile) langSqBtnMobile.classList.toggle('active', lang === 'sq');
+            if (langEnBtnMobile) langEnBtnMobile.classList.toggle('active', lang === 'en');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50,
+                easing: 'ease-out-cubic',
+            });
+
+            const preferredLanguage = localStorage.getItem('preferredLanguage') || 'sq';
+            changeLanguage(preferredLanguage);
+
+            const hamburgerBtnVWGolf6Details = document.getElementById('hamburgerBtnVWGolf6Details');
+            const mobileMenuVWGolf6Details = document.getElementById('mobileMenuVWGolf6Details');
+
+            if (hamburgerBtnVWGolf6Details && mobileMenuVWGolf6Details) {
+                const mobileNavLinksVWGolf6Details = mobileMenuVWGolf6Details.querySelectorAll('a');
+
+                hamburgerBtnVWGolf6Details.addEventListener('click', () => {
+                    const isHidden = mobileMenuVWGolf6Details.classList.toggle('hidden');
+                    if (isHidden) {
+                        hamburgerBtnVWGolf6Details.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
+                        document.body.style.overflow = '';
+                    } else {
+                        hamburgerBtnVWGolf6Details.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+
+                mobileNavLinksVWGolf6Details.forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenuVWGolf6Details.classList.add('hidden');
+                        hamburgerBtnVWGolf6Details.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+
+            const header = document.getElementById('mainHeader');
+            if (header) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        header.classList.add('scrolled');
+                    } else {
+                        header.classList.remove('scrolled');
+                    }
+                });
+            }
+            const firstThumbnail = document.querySelector('.gallery-image');
+            if (firstThumbnail) {
+                firstThumbnail.classList.add('active-thumbnail');
+            }
+        });
+    </script>
+</body>
+
+</ht
