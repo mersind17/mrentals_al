@@ -23,6 +23,7 @@
             --text-light: #f0f0f0;
             --text-dark: #004a3e;
             --card-bg: #006758;
+            /* Used for consistency, though not directly on this page */
             --card-border: #005a4d;
             --details-bg: #005c4f;
         }
@@ -32,7 +33,8 @@
             background-color: var(--primary-color);
             background-image: linear-gradient(to bottom right, var(--primary-color), var(--secondary-color));
             color: var(--text-light);
-            font-size: 17px;
+            font-size: 16px;
+            /* Base font size for mobile */
             scroll-behavior: smooth;
             overflow-x: hidden;
         }
@@ -51,19 +53,36 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Logo sizing on scroll for this specific details page */
-        header.scrolled #headerLogoMercedesDetails.h-14 {
-            /* Mobile initial: h-14 (56px) */
+        /* Logo sizing (consistent with main page) */
+        #headerLogoDetails {
+            /* Unique ID for this page's logo if needed, or use a class */
             height: 3rem;
-            /* Scrolled: 48px */
+            /* 48px for mobile */
+            transition: height 0.3s ease;
         }
 
-        header.scrolled #headerLogoMercedesDetails.md\:h-16 {
-            /* Desktop initial: md:h-16 (64px) */
-            height: 3.5rem;
-            /* Scrolled: 56px */
+        @media (min-width: 768px) {
+
+            /* md breakpoint */
+            #headerLogoDetails {
+                height: 4rem;
+                /* 64px for desktop */
+            }
         }
 
+        header.scrolled #headerLogoDetails {
+            height: 2.5rem;
+            /* 40px for mobile scrolled */
+        }
+
+        @media (min-width: 768px) {
+
+            /* md breakpoint */
+            header.scrolled #headerLogoDetails {
+                height: 3.5rem;
+                /* 56px for desktop scrolled */
+            }
+        }
 
         .lang-switcher button.active img {
             outline: 3px solid var(--accent-color);
@@ -72,20 +91,19 @@
         }
 
         .lang-switcher img {
-            /* Default for desktop */
-            width: 36px;
-            height: 24px;
+            width: 32px;
+            height: 21px;
             object-fit: cover;
             border-radius: 5px;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
 
-        /* Mobile language switcher images for this details page */
-        .md\:hidden .lang-switcher-mercedes-details img {
-            width: 32px;
-            height: 21px;
+        @media (min-width: 768px) {
+            .lang-switcher img {
+                width: 36px;
+                height: 24px;
+            }
         }
-
 
         .lang-switcher button:hover img {
             transform: scale(1.18) rotate(3deg);
@@ -95,7 +113,7 @@
         .main-action-button {
             transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: 0.5px;
         }
 
@@ -107,40 +125,39 @@
 
         .car-details-section {
             background-color: var(--details-bg);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            /* Slightly less rounded for a tighter look */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            /* Adjusted shadow */
         }
 
         .gallery-image {
-            border-radius: 12px;
+            border-radius: 8px;
+            /* Consistent rounding */
             object-fit: cover;
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            /* Added border-color transition */
-            border: 2px solid var(--card-border);
-            /* Default border */
+            border: 2px solid transparent;
+            /* Start transparent for hover effect */
             cursor: pointer;
         }
 
         .gallery-image:hover,
         .gallery-image.active-thumbnail {
-            /* Added active-thumbnail class for JS to use */
-            transform: scale(1.03);
-            /* Slightly less aggressive scale on hover */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-            /* Enhanced shadow */
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             border-color: var(--accent-color);
-            /* Accent color border on hover/active */
         }
 
-
         .main-image-container {
-            border-radius: 16px;
+            border-radius: 12px;
+            /* Consistent rounding */
             overflow: hidden;
             border: 3px solid var(--accent-color);
+            /* Highlight main image */
         }
 
         .main-image-container img {
-            border-radius: 13px;
+            border-radius: 9px;
             display: block;
             /* Remove extra space below image */
             width: 100%;
@@ -150,9 +167,24 @@
         .spec-list li {
             display: flex;
             align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem 0;
+            /* Adjusted padding */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            /* Softer border */
+            font-size: 0.95rem;
+            /* Mobile spec font size */
         }
+
+        @media (min-width: 768px) {
+
+            /* md */
+            .spec-list li {
+                font-size: 1rem;
+                /* Desktop spec font size */
+                padding: 0.75rem 0;
+            }
+        }
+
 
         .spec-list li:last-child {
             border-bottom: none;
@@ -161,8 +193,19 @@
         .spec-list .spec-label {
             font-weight: 600;
             color: var(--accent-color);
-            min-width: 120px;
+            min-width: 100px;
+            /* Adjusted for mobile */
+            margin-right: 0.5rem;
         }
+
+        @media (min-width: 768px) {
+
+            /* md */
+            .spec-list .spec-label {
+                min-width: 120px;
+            }
+        }
+
 
         .spec-list .spec-value {
             color: var(--text-light);
@@ -176,20 +219,20 @@
         }
 
         nav a {
-            /* Base style for all nav links */
+            /* Applies to both desktop and mobile nav links */
             position: relative;
             padding-bottom: 0.4rem;
             transition: color 0.3s ease;
             display: block;
-            /* For mobile menu items to be full width tappable */
+            /* Ensure full clickable area for mobile */
         }
 
         @media (min-width: 768px) {
 
-            /* md breakpoint for desktop nav */
-            nav#mainNavDesktopMercedesDetails a {
-                /* Target only desktop nav links */
+            /* md */
+            nav a {
                 display: inline-block;
+                /* Revert for desktop */
             }
         }
 
@@ -208,13 +251,14 @@
 
         nav a:hover::after,
         nav a.active-link::after {
-            /* active-link for current page if applicable (less relevant on details page) */
+            /* active-link for current page if applicable */
             width: 100%;
         }
 
-        /* For mobile menu on this details page */
-        #mainNavMobileMercedesDetails ul li a.active-link::after,
-        #mainNavMobileMercedesDetails ul li a:hover::after {
+        /* For mobile menu, make underline full width if active */
+        #mainNavMobileDetails ul li a.active-link::after,
+        /* Unique ID for this page's mobile nav */
+        #mainNavMobileDetails ul li a:hover::after {
             width: 60%;
         }
 
@@ -233,12 +277,24 @@
         }
 
         .back-to-main-button {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.08);
+            /* Softer background */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.9rem;
+            /* Mobile size */
+        }
+
+        @media (min-width: 768px) {
+
+            /* md */
+            .back-to-main-button {
+                font-size: 1rem;
+                /* Desktop size */
+            }
         }
 
         .back-to-main-button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.15);
             border-color: var(--accent-color);
             color: var(--accent-color);
         }
@@ -247,18 +303,18 @@
 
 <body class="text-white">
 
-    <header id="mainHeaderMercedesDetails" class="shadow-lg sticky top-0 z-50">
+    <header id="mainHeader" class="shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-            <a href="index.html" class="flex items-center" data-aos="fade-right" data-aos-duration="800"> <img
-                    src="Logo.jpg" alt="MRentals Logo" id="headerLogoMercedesDetails"
-                    class="h-14 md:h-16 mr-3 transition-all duration-300" data-translate-alt-key="alt_logo"
-                    onerror="this.src='https://placehold.co/220x70/007f6b/FFFFFF?text=Logo+Gabim&font=Inter&bold'; this.onerror=null;" />
+            <a href="index.html" class="flex items-center" data-aos="fade-right" data-aos-duration="800">
+                <img src="Logo.jpg" alt="MRentals Logo" id="headerLogoDetails" class="mr-2 md:mr-3"
+                    data-translate-alt-key="alt_logo"
+                    onerror="this.src='https://placehold.co/220x70/007f6b/FFFFFF?text=Logo+Error&font=Inter&bold'; this.onerror=null;" />
             </a>
 
             <div class="hidden md:flex items-center space-x-3 md:space-x-5" data-aos="fade-left"
                 data-aos-duration="800">
-                <nav id="mainNavDesktopMercedesDetails">
-                    <ul class="flex space-x-3 md:space-x-5 text-lg font-semibold">
+                <nav id="mainNavDesktopDetails">
+                    <ul class="flex space-x-3 md:space-x-5 text-base lg:text-lg font-semibold">
                         <li><a href="index.html#hero" class="hover:text-[var(--accent-color)]"
                                 data-translate-key="nav_home">Kryefaqja</a></li>
                         <li><a href="index.html#cars" class="hover:text-[var(--accent-color)]"
@@ -275,29 +331,25 @@
                 </nav>
                 <div
                     class="lang-switcher flex items-center space-x-2 border-l border-gray-700 pl-3 ml-1 md:pl-5 md:ml-3">
-                    <button id="lang-sq-btn" onclick="changeLanguage('sq')" class="p-1 active"> <img src="shqip.jpg"
-                            alt="Shqip" data-translate-alt-key="alt_albanian_flag"
-                            onerror="this.src='https://placehold.co/36x24/FF0000/FFFFFF?text=SQ&font=Inter&bold'; this.onerror=null;">
+                    <button id="lang-sq-btn" onclick="changeLanguage('sq')" class="p-1 active">
+                        <img src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag">
                     </button>
-                    <button id="lang-en-btn" onclick="changeLanguage('en')" class="p-1"> <img src="english.jpg"
-                            alt="English" data-translate-alt-key="alt_english_flag"
-                            onerror="this.src='https://placehold.co/36x24/0000FF/FFFFFF?text=EN&font=Inter&bold'; this.onerror=null;">
+                    <button id="lang-en-btn" onclick="changeLanguage('en')" class="p-1">
+                        <img src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag">
                     </button>
                 </div>
             </div>
 
             <div class="md:hidden flex items-center space-x-3">
-                <div class="lang-switcher lang-switcher-mercedes-details flex items-center space-x-2"> <button
-                        id="lang-sq-btn-mercedes-mobile" onclick="changeLanguage('sq')" class="p-1"> <img
-                            src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag"
-                            onerror="this.src='https://placehold.co/32x21/FF0000/FFFFFF?text=SQ&font=Inter&bold'; this.onerror=null;">
+                <div class="lang-switcher flex items-center space-x-2">
+                    <button id="lang-sq-btn-mobile" onclick="changeLanguage('sq')" class="p-1">
+                        <img src="shqip.jpg" alt="Shqip" data-translate-alt-key="alt_albanian_flag">
                     </button>
-                    <button id="lang-en-btn-mercedes-mobile" onclick="changeLanguage('en')" class="p-1"> <img
-                            src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag"
-                            onerror="this.src='https://placehold.co/32x21/0000FF/FFFFFF?text=EN&font=Inter&bold'; this.onerror=null;">
+                    <button id="lang-en-btn-mobile" onclick="changeLanguage('en')" class="p-1">
+                        <img src="english.jpg" alt="English" data-translate-alt-key="alt_english_flag">
                     </button>
                 </div>
-                <button id="hamburgerBtnMercedesDetails"
+                <button id="hamburgerBtnDetails"
                     class="text-white p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--accent-color)] rounded">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
@@ -308,9 +360,9 @@
             </div>
         </div>
 
-        <div id="mobileMenuMercedesDetails"
+        <div id="mobileMenuDetails"
             class="hidden md:hidden bg-[rgba(0,40,32,0.97)] backdrop-blur-lg absolute top-full left-0 w-full shadow-xl border-t border-[rgba(255,255,255,0.1)]">
-            <nav id="mainNavMobileMercedesDetails" class="py-4">
+            <nav id="mainNavMobileDetails" class="py-4">
                 <ul class="flex flex-col items-center space-y-1 text-lg font-semibold">
                     <li><a href="index.html#hero" class="hover:text-[var(--accent-color)] py-3 px-4 w-full text-center"
                             data-translate-key="nav_home">Kryefaqja</a></li>
@@ -333,52 +385,53 @@
         </div>
     </header>
 
-    <main class="py-12 md:py-20">
-        <div class="container mx-auto px-6">
-            <div class="mb-8" data-aos="fade-right">
+    <main class="py-8 md:py-12 lg:py-16">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="mb-6 md:mb-8" data-aos="fade-right">
                 <a href="index.html"
-                    class="inline-flex items-center text-lg text-gray-300 hover:text-[var(--accent-color)] transition-colors duration-300 back-to-main-button px-4 py-2 rounded-lg">
+                    class="inline-flex items-center text-gray-300 hover:text-[var(--accent-color)] transition-colors duration-300 back-to-main-button px-4 py-2 rounded-lg">
                     <i class="fas fa-arrow-left mr-2"></i>
                     <span data-translate-key="back_to_cars_list">Kthehu te Lista e Makinave</span>
                 </a>
             </div>
 
-            <div class="car-details-section p-6 md:p-10 lg:p-12" data-aos="fade-up" data-aos-duration="900">
-                <h1 class="text-4xl md:text-5xl font-black text-white mb-8 text-center md:text-left"
+            <div class="car-details-section p-4 md:p-8 lg:p-10" data-aos="fade-up" data-aos-duration="900">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-6 md:mb-8 text-center md:text-left"
                     data-translate-key="car_name_mercedes_e_evo_details">Mercedes-Benz E Class //EVO</h1>
 
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 lg:gap-12 items-start">
                     <div class="lg:col-span-3">
                         <div class="main-image-container mb-4" data-aos="zoom-in">
                             <img id="mainCarImage" src="benc1.jpg" alt="Mercedes-Benz E Class //EVO pamje kryesore"
                                 class="w-full h-auto object-cover">
                         </div>
-                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-3">
                             <img src="benc1.jpg" alt="Mercedes-Benz E Class //EVO pamje anësore"
-                                class="gallery-image w-full h-24 md:h-32 active-thumbnail"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32 active-thumbnail"
                                 onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="100">
                             <img src="benc2.jpg" alt="Mercedes-Benz E Class //EVO pamje e brendshme"
-                                class="gallery-image w-full h-24 md:h-32" onclick="changeMainImage(this.src, this)"
-                                data-aos="fade-up" data-aos-delay="200">
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32"
+                                onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="200">
                             <img src="benc3.jpg" alt="Mercedes-Benz E Class //EVO detaj"
-                                class="gallery-image w-full h-24 md:h-32" onclick="changeMainImage(this.src, this)"
-                                data-aos="fade-up" data-aos-delay="300">
-                            <img src="Logo.jpg" alt="Mercedes-Benz E Class //EVO pamje prapa"
-                                class="gallery-image w-full h-24 md:h-32 hidden sm:block"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32"
+                                onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="300">
+                            <img src="Logo.jpg"
+                                alt="Mercedes-Benz E Class EVO rear view parked in an outdoor lot with other vehicles visible in the background, neutral atmosphere"
+                                class="gallery-image w-full h-20 sm:h-24 md:h-32 hidden sm:block"
                                 onclick="changeMainImage(this.src, this)" data-aos="fade-up" data-aos-delay="400"
                                 onerror="this.style.display='none';">
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2">
-                        <div class="bg-[var(--primary-color)] p-6 rounded-xl shadow-lg">
-                            <h2 class="text-3xl font-bold text-[var(--accent-color)] mb-6"
+                    <div class="lg:col-span-2 mt-6 lg:mt-0">
+                        <div class="bg-[var(--primary-color)] p-4 md:p-6 rounded-xl shadow-lg">
+                            <h2 class="text-2xl md:text-3xl font-bold text-[var(--accent-color)] mb-4 md:mb-6"
                                 data-translate-key="specifications_title">Specifikimet</h2>
-                            <ul class="spec-list text-lg space-y-1">
+                            <ul class="spec-list space-y-1">
                                 <li><span class="spec-label"><i class="fas fa-cogs"></i><span
                                             data-translate-key="spec_engine">Motorri:</span></span> <span
-                                        class="spec-value" data-translate-key="engine_val_mercedes_e_evo_details">2.2
-                                        </span></li>
+                                        class="spec-value" data-translate-key="engine_val_audi_a5_details">2.2
+                                    </span></li>
                                 <li><span class="spec-label"><i class="fas fa-exchange-alt"></i><span
                                             data-translate-key="spec_gearbox">Kambio:</span></span> <span
                                         class="spec-value" data-translate-key="gearbox_automatic">Automatike</span></li>
@@ -389,6 +442,7 @@
                                             data-translate-key="spec_year">Viti:</span></span> <span
                                         class="spec-value">2007</span></li>
 
+
                                 <li><span class="spec-label"><i class="fas fa-users"></i><span
                                             data-translate-key="spec_seats">Sedilje:</span></span> <span
                                         class="spec-value">5</span></li>
@@ -397,14 +451,14 @@
                                         class="spec-value" data-translate-key="yes">Po</span></li>
                             </ul>
 
-                            <div class="mt-8 text-center">
-                                <p class="text-4xl font-extrabold text-white mb-2"><span
+                            <div class="mt-6 md:mt-8 text-center">
+                                <p class="text-3xl md:text-4xl font-extrabold text-white mb-2"><span
                                         data-translate-key="price_label_details">Çmimi:</span> 30€<span
-                                        class="text-2xl font-semibold"
+                                        class="text-xl md:text-2xl font-semibold"
                                         data-translate-key="price_per_day_details">/dita</span></p>
                                 <button
                                     onclick="openWhatsAppForCar('Mercedes-Benz E Class //EVO', document.documentElement.lang)"
-                                    class="w-full mt-4 bg-[var(--accent-color)] text-[var(--text-dark)] py-4 px-6 rounded-lg text-xl main-action-button"
+                                    class="w-full mt-4 bg-[var(--accent-color)] text-[var(--text-dark)] py-3 px-5 md:py-4 md:px-6 rounded-lg text-lg md:text-xl main-action-button"
                                     data-translate-key="book_this_car_details">
                                     <i class="fab fa-whatsapp mr-2"></i>Rezervo Tani në WhatsApp
                                 </button>
@@ -416,12 +470,11 @@
         </div>
     </main>
 
-    <footer class="bg-[#00473b] text-center py-14">
-        <div class="container mx-auto px-6 text-gray-400">
-            <p id="copyrightMain" class="text-lg" data-translate-key="copyright">&copy; {year} MRentals. Të gjitha të
-                drejtat e rezervuara.</p>
+    <footer class="bg-[#00473b] text-center py-10 md:py-14">
+        <div class="container mx-auto px-4 sm:px-6 text-gray-400">
+            <p id="copyrightMain" class="text-base md:text-lg" data-translate-key="copyright">&copy; {year} MRentals. Të
+                gjitha të drejtat e rezervuara.</p>
 
-        </div>
     </footer>
 
     <script>
@@ -430,6 +483,8 @@
                 page_title_mercedes_e_evo: "Mercedes-Benz E Class //EVO Details - MRentals",
                 alt_logo: "MRentals Premium Logo",
                 nav_home: "Home",
+                spec_gearbox: "Gearbox:",
+                gearbox_automatic: "Automatic",
                 nav_cars: "Our Cars",
                 nav_why_us: "Why Choose Us?",
                 nav_book: "Book Now",
@@ -445,9 +500,7 @@
                 spec_fuel: "Fuel:",
                 fuel_diesel_details: "Diesel",
                 spec_year: "Year:",
-                spec_color: "Color:",
-                color_black: "Black",
-                spec_doors: "Doors:",
+
                 spec_seats: "Seats:",
                 spec_ac: "Air Conditioning:",
                 yes: "Yes",
@@ -455,7 +508,7 @@
                 price_per_day_details: "/day",
                 book_this_car_details: "Book Now on WhatsApp",
                 copyright: "&copy; {year} MRentals. All rights reserved.",
-                designed_by: "Designed with <span class='text-[var(--accent-color)] text-2xl mx-1 heart-icon'>&hearts;</span> by Your Team",
+                designed_by: "Designed with <span class='text-[var(--accent-color)] text-xl md:text-2xl mx-1 heart-icon'>&hearts;</span> by Your Team",
                 whatsapp_prefill_book_car: "Hello, I am interested in booking the {carName}."
             },
             sq: {
@@ -474,12 +527,12 @@
                 specifications_title: "Specifikimet",
                 spec_engine: "Motorri:",
                 engine_val_mercedes_e_evo_details: "2.2 ",
+                spec_gearbox: "Kambio:",
+                gearbox_automatic: "Automatik",
                 spec_fuel: "Karburanti:",
                 fuel_diesel_details: "Naftë",
                 spec_year: "Viti:",
-                spec_color: "Ngjyra:",
-                color_black: "E Zezë",
-                spec_doors: "Dyert:",
+
                 spec_seats: "Sedilje:",
                 spec_ac: "Kondicioner:",
                 yes: "Po",
@@ -487,14 +540,14 @@
                 price_per_day_details: "/dita",
                 book_this_car_details: "Rezervo Tani në WhatsApp",
                 copyright: "&copy; {year} MRentals. Të gjitha të drejtat e rezervuara.",
-                designed_by: "Dizajnuar me <span class='text-[var(--accent-color)] text-2xl mx-1 heart-icon'>&hearts;</span> nga Ekipi Juaj",
+                designed_by: "Dizajnuar me <span class='text-[var(--accent-color)] text-xl md:text-2xl mx-1 heart-icon'>&hearts;</span> nga Ekipi Juaj",
                 whatsapp_prefill_book_car: "Përshëndetje, jam i interesuar të rezervoj {carName}."
             }
         };
 
-        function changeMainImage(newSrc, clickedThumbnail) { // Added clickedThumbnail parameter
+        function changeMainImage(newSrc, clickedThumbnail) {
             document.getElementById('mainCarImage').src = newSrc;
-            // Update active thumbnail state
+            // Update active thumbnail
             const thumbnails = document.querySelectorAll('.gallery-image');
             thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail'));
             if (clickedThumbnail) {
@@ -503,7 +556,7 @@
         }
 
         function openWhatsAppForCar(carName, currentLang) {
-            const lang = currentLang || document.documentElement.lang || localStorage.getItem('preferredLanguage') || 'sq';
+            const lang = currentLang || document.documentElement.lang || 'sq';
             let prefillText = translations[lang] ? translations[lang]['whatsapp_prefill_book_car'] : "Hello, I am interested in booking the {carName}.";
             prefillText = prefillText.replace('{carName}', carName);
             const whatsappUrl = `https://wa.me/355695169873?text=${encodeURIComponent(prefillText)}`;
@@ -520,7 +573,7 @@
                         const year = new Date().getFullYear();
                         translatedText = translatedText.replace('{year}', year);
                     }
-                    if (key === 'copyright' || key === 'designed_by' || element.innerHTML.includes("<br")) {
+                    if (key === 'copyright' || key === 'designed_by' || element.innerHTML.includes("<br") || key.includes("_description_")) {
                         element.innerHTML = translatedText;
                     } else {
                         element.textContent = translatedText;
@@ -556,80 +609,66 @@
             // Desktop lang buttons
             document.getElementById('lang-sq-btn').classList.toggle('active', lang === 'sq');
             document.getElementById('lang-en-btn').classList.toggle('active', lang === 'en');
-            // Mobile lang buttons for this specific page
-            const langSqBtnMobileMercedes = document.getElementById('lang-sq-btn-mercedes-mobile');
-            const langEnBtnMobileMercedes = document.getElementById('lang-en-btn-mercedes-mobile');
-            if (langSqBtnMobileMercedes) langSqBtnMobileMercedes.classList.toggle('active', lang === 'sq');
-            if (langEnBtnMobileMercedes) langEnBtnMobileMercedes.classList.toggle('active', lang === 'en');
+            // Mobile lang buttons
+            const langSqBtnMobile = document.getElementById('lang-sq-btn-mobile');
+            const langEnBtnMobile = document.getElementById('lang-en-btn-mobile');
+            if (langSqBtnMobile) langSqBtnMobile.classList.toggle('active', lang === 'sq');
+            if (langEnBtnMobile) langEnBtnMobile.classList.toggle('active', lang === 'en');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             AOS.init({
-                duration: 900,
+                duration: 800, // Consistent duration
                 once: true,
-                offset: 80,
+                offset: 50,   // Consistent offset
                 easing: 'ease-out-cubic',
             });
 
             const preferredLanguage = localStorage.getItem('preferredLanguage') || 'sq';
             changeLanguage(preferredLanguage);
 
-            // Hamburger Menu Logic for Mercedes Details Page
-            const hamburgerBtnMercedes = document.getElementById('hamburgerBtnMercedesDetails');
-            const mobileMenuMercedes = document.getElementById('mobileMenuMercedesDetails');
+            // Hamburger Menu Logic for Details Page
+            const hamburgerBtnDetails = document.getElementById('hamburgerBtnDetails');
+            const mobileMenuDetails = document.getElementById('mobileMenuDetails');
 
-            if (hamburgerBtnMercedes && mobileMenuMercedes) {
-                const mobileNavLinksMercedes = mobileMenuMercedes.querySelectorAll('a');
+            if (hamburgerBtnDetails && mobileMenuDetails) {
+                const mobileNavLinksDetails = mobileMenuDetails.querySelectorAll('a');
 
-                hamburgerBtnMercedes.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    const isHidden = mobileMenuMercedes.classList.toggle('hidden');
-                    hamburgerBtnMercedes.setAttribute('aria-expanded', String(!isHidden));
+                hamburgerBtnDetails.addEventListener('click', () => {
+                    const isHidden = mobileMenuDetails.classList.toggle('hidden');
                     if (isHidden) {
-                        hamburgerBtnMercedes.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
+                        hamburgerBtnDetails.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
                         document.body.style.overflow = '';
                     } else {
-                        hamburgerBtnMercedes.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                        hamburgerBtnDetails.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
                         document.body.style.overflow = 'hidden';
                     }
                 });
 
-                mobileNavLinksMercedes.forEach(link => {
+                mobileNavLinksDetails.forEach(link => {
                     link.addEventListener('click', () => {
-                        mobileMenuMercedes.classList.add('hidden');
-                        hamburgerBtnMercedes.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
-                        hamburgerBtnMercedes.setAttribute('aria-expanded', 'false');
+                        mobileMenuDetails.classList.add('hidden');
+                        hamburgerBtnDetails.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
                         document.body.style.overflow = '';
                     });
-                });
-
-                document.addEventListener('click', (event) => {
-                    if (!mobileMenuMercedes.classList.contains('hidden') && !mobileMenuMercedes.contains(event.target) && !hamburgerBtnMercedes.contains(event.target)) {
-                        mobileMenuMercedes.classList.add('hidden');
-                        hamburgerBtnMercedes.innerHTML = `<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h4"></path></svg>`;
-                        hamburgerBtnMercedes.setAttribute('aria-expanded', 'false');
-                        document.body.style.overflow = '';
-                    }
                 });
             }
 
             // Header scroll effect
-            const headerMercedes = document.getElementById('mainHeaderMercedesDetails'); // Target this page's header
-            if (headerMercedes) {
+            const header = document.getElementById('mainHeader');
+            if (header) {
                 window.addEventListener('scroll', () => {
                     if (window.scrollY > 50) {
-                        headerMercedes.classList.add('scrolled');
+                        header.classList.add('scrolled');
                     } else {
-                        headerMercedes.classList.remove('scrolled');
+                        header.classList.remove('scrolled');
                     }
                 });
             }
-            // Set initial active thumbnail for gallery
+            // Set initial active thumbnail
             const firstThumbnail = document.querySelector('.gallery-image');
             if (firstThumbnail) {
                 firstThumbnail.classList.add('active-thumbnail');
-                // Ensure changeMainImage is called with the thumbnail element itself for styling
-                // changeMainImage(firstThumbnail.src, firstThumbnail); // Optional: if you want it to reflect immediately
             }
         });
     </script>
